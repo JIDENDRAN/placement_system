@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - PlacementHub{% endblock %}
+
+{% block content %}
+<div class="row mb-5 align-items-center">
+    <div class="col-md-6">
+        <h2 class="fw-bold">Performance Analytics</h2>
+        <p class="text-secondary">Visualize your progress and download your reports.</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <div class="dropdown d-inline-block">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-download me-2"></i>Download Report
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'export_csv' %}">Download CSV</a></li>
+                <li><a class="dropdown-item" href="{% url 'export_pdf' %}">Download PDF</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-4">Score Trends</h5>
+            <canvas id="performanceChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 h-100">
+            <h5 class="fw-bold mb-4">Summary</h5>
+            <div class="mb-4">
+                <h6 class="text-secondary small fw-bold">AVERAGE SCORE</h6>
+                <h2 class="text-primary fw-bold">78%</h2>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary small fw-bold">TESTS COMPLETED</h6>
+                <h2 class="text-success fw-bold">{{ attempts.count }}</h2>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary small fw-bold">TOP AREA</h6>
+                <h2 class="text-warning fw-bold">Quantitative</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-4">Detailed Test Records</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Test Title</th>
+                            <th>Date Taken</th>
+                            <th>Score</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attempt in attempts %}
+                        <tr>
+                            <td>{{ attempt.test.title }}</td>
+                            <td>{{ attempt.completed_at|date:"d M Y" }}</td>
+                            <td>{{ attempt.score }} / {{ attempt.total_marks }}</td>
+                            <td>
+                                <div class="progress" style="height: 5px; width: 100px;">
+                                    <div class="progress-bar bg-primary"
+                                        style="width: {% widthratio attempt.score attempt.total_marks 100 %}%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels| safe }},
+        datasets: [{
+            label: 'Score',
+            data: {{ scores| safe }},
+        backgroundColor: '#2a5298',
+        borderRadius: 5
+            }]
+        },
+        options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+    });
+</script>
+{% endblock %}

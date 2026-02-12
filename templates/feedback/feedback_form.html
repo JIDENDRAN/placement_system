@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Submit Feedback - PlacementHub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h3 class="fw-bold mb-4">Share Your Interview Experience</h3>
+            <p class="text-secondary mb-4">Your feedback helps fellow students prepare better. Thank you for
+                contributing!</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">{{ form.company|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ form.job_role|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">{{ form.interview_date|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ form.status|as_crispy_field }}</div>
+                </div>
+                {{ form.overall_difficulty|as_crispy_field }}
+                {{ form.overall_experience|as_crispy_field }}
+                {{ form.tips|as_crispy_field }}
+
+                <div class="d-grid mt-4 gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit Feedback</button>
+                    <a href="{% url 'feedback_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

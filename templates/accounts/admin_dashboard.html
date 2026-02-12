@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - PlacementHub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h2 class="fw-bold">Admin Control Center</h2>
+        <p class="text-secondary">Manage entities, users, and download reports.</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-3">
+        <div class="card p-3 bg-white border-start border-4 border-primary">
+            <h6 class="text-secondary small fw-bold">TOTAL STUDENTS</h6>
+            <h2 class="mb-0">1,240</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 bg-white border-start border-4 border-success">
+            <h6 class="text-secondary small fw-bold">TOTAL ALUMNI</h6>
+            <h2 class="mb-0">450</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 bg-white border-start border-4 border-warning">
+            <h6 class="text-secondary small fw-bold">ACTIVE COMPANIES</h6>
+            <h2 class="mb-0">85</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 bg-white border-start border-4 border-info">
+            <h6 class="text-secondary small fw-bold">Drives this Month</h6>
+            <h2 class="mb-0">12</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-4">User Statistics</h5>
+            <canvas id="userStatsChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-4">Quick Actions</h5>
+            <div class="d-grid gap-3">
+                <a href="{% url 'company_create' %}" class="btn btn-outline-primary"><i
+                        class="bi bi-building-add me-2"></i>Add Company</a>
+                <a href="#" class="btn btn-outline-success"><i class="bi bi-people me-2"></i>Manage Users</a>
+                <a href="#" class="btn btn-outline-info"><i class="bi bi-file-earmark-pdf me-2"></i>Generate Reports</a>
+                <a href="/admin/" class="btn btn-dark"><i class="bi bi-shield-lock me-2"></i>Advanced Admin Panel</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('userStatsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Student Registrations',
+                data: [40, 60, 80, 120, 150, 180],
+                backgroundColor: '#2a5298'
+            }]
+        },
+        options: {
+            responsive: true,
+        }
+    });
+</script>
+{% endblock %}

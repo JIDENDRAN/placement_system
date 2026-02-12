@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Test Results{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card p-5">
+            <div class="mb-4">
+                <i class="bi bi-patch-check-fill fs-1 text-success"></i>
+            </div>
+            <h2 class="fw-bold mb-3">Assessment Completed!</h2>
+            <p class="text-secondary mb-5">You have successfully submitted the {{ attempt.test.title }}.</p>
+
+            <div class="display-1 fw-bold text-primary mb-2">{{ attempt.score }}/{{ attempt.total_marks }}</div>
+            <p class="h4 mb-5 text-secondary">Your Score</p>
+
+            <div class="progress mb-4" style="height: 10px;">
+                <div class="progress-bar bg-success" role="progressbar"
+                    style="width: {% widthratio attempt.score attempt.total_marks 100 %}%"></div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                <a href="{% url 'test_history' %}" class="btn btn-outline-secondary">View Test History</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

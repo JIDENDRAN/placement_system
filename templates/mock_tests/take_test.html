@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Taking Test: {{ test.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4 mb-4 bg-dark text-white border-0 sticky-top" style="top: 80px; z-index: 1000;">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold">{{ test.title }}</h4>
+                <div id="timer" class="fs-5 fw-bold"><i class="bi bi-stopwatch me-2"></i>--:--</div>
+            </div>
+        </div>
+
+        <form method="post" id="testForm">
+            {% csrf_token %}
+            {% for question in questions %}
+            <div class="card p-4 mb-4">
+                <h5 class="fw-bold mb-4">Question {{ forloop.counter }}</h5>
+                <p class="lead mb-4">{{ question.text }}</p>
+
+                <div class="form-check mb-3 p-3 border rounded">
+                    <input class="form-check-input ms-0 me-3" type="radio" name="question_{{ question.id }}"
+                        id="q{{ question.id }}a" value="A" required>
+                    <label class="form-check-label w-100" for="q{{ question.id }}a">
+                        {{ question.option_a }}
+                    </label>
+                </div>
+                <div class="form-check mb-3 p-3 border rounded">
+                    <input class="form-check-input ms-0 me-3" type="radio" name="question_{{ question.id }}"
+                        id="q{{ question.id }}b" value="B">
+                    <label class="form-check-label w-100" for="q{{ question.id }}b">
+                        {{ question.option_b }}
+                    </label>
+                </div>
+                <div class="form-check mb-3 p-3 border rounded">
+                    <input class="form-check-input ms-0 me-3" type="radio" name="question_{{ question.id }}"
+                        id="q{{ question.id }}c" value="C">
+                    <label class="form-check-label w-100" for="q{{ question.id }}c">
+                        {{ question.option_c }}
+                    </label>
+                </div>
+                <div class="form-check mb-3 p-3 border rounded">
+                    <input class="form-check-input ms-0 me-3" type="radio" name="question_{{ question.id }}"
+                        id="q{{ question.id }}d" value="D">
+                    <label class="form-check-label w-100" for="q{{ question.id }}d">
+                        {{ question.option_d }}
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="d-grid gap-2 mb-5">
+                <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">Submit Assessment</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let duration = {{ test.duration_minutes }} * 60;
+    const timerDisplay = document.getElementById('timer');
+    const form = document.getElementById('testForm');
+
+    const countdown = setInterval(() => {
+        let minutes = Math.floor(duration / 60);
+        let seconds = duration % 60;
+
+        timerDisplay.innerHTML = `<i class="bi bi-stopwatch me-2"></i>${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+        if (duration <= 0) {
+            clearInterval(countdown);
+            alert("Time's up! Your test will be submitted automatically.");
+            form.submit();
+        }
+        duration--;
+    }, 1000);
+</script>
+{% endblock %}

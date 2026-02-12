@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.name }} - Details{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'company_list' %}">Companies</a></li>
+        <li class="breadcrumb-item active">{{ company.name }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card p-4 mb-4">
+            <div class="d-flex align-items-center mb-4">
+                {% if company.logo %}
+                <img src="{{ company.logo.url }}" class="me-4" style="width: 80px; height: 80px; object-fit: contain;">
+                {% endif %}
+                <div>
+                    <h1 class="fw-bold mb-0">{{ company.name }}</h1>
+                    <p class="lead text-secondary">{{ company.industry }} | {{ company.location }}</p>
+                </div>
+            </div>
+
+            <h5 class="fw-bold">About the Company</h5>
+            <p>{{ company.description }}</p>
+
+            <h5 class="fw-bold mt-4">Required Skills</h5>
+            <div class="mb-4">
+                {% for skill in company.required_skills.split %}
+                <span class="badge bg-primary me-2 mb-2">{{ skill|cut:"," }}</span>
+                {% endfor %}
+            </div>
+
+            <h5 class="fw-bold mt-4">Eligibility Criteria</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Minimum CGPA: <strong>{{ company.min_cgpa }}</strong></li>
+                <li class="list-group-item">CTC Range: <strong>{{ company.ctc_range }}</strong></li>
+                <li class="list-group-item">Industry: <strong>{{ company.industry }}</strong></li>
+            </ul>
+        </div>
+
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3">Interview Experiences</h5>
+            {% for feedback in company.feedbacks.all %}
+            <div class="border-bottom pb-3 mb-3">
+                <div class="d-flex justify-content-between">
+                    <h6 class="fw-bold mb-1">{{ feedback.job_role }}</h6>
+                    <span class="text-secondary small">{{ feedback.interview_date }}</span>
+                </div>
+                <p class="small text-muted mb-2">By {{ feedback.alumni.username }} | Difficulty: {{
+                    feedback.get_overall_difficulty_display }}</p>
+                <a href="{% url 'feedback_detail' feedback.pk %}" class="btn btn-link btn-sm p-0">Read full feedback</a>
+            </div>
+            {% empty %}
+            <p class="text-secondary">No interview experiences shared yet for this company.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-4 mb-4 bg-light border-0">
+            <h5 class="fw-bold mb-3">Recruitment Info</h5>
+            <p class="mb-1"><i class="bi bi-calendar-event me-2"></i><strong>Next Drive:</strong> {{
+                company.recruitment_drive_date|default:"TBA" }}</p>
+            <p class="mb-3"><i class="bi bi-check-circle me-2 text-success"></i><strong>Status:</strong> {% if
+                company.active_hiring %}Active Hiring{% else %}Closed{% endif %}</p>
+
+            {% if company.website %}
+            <a href="{{ company.website }}" target="_blank" class="btn btn-primary w-100">Visit Official Website</a>
+            {% endif %}
+        </div>
+
+        {% if user.role == 'ADMIN' %}
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3">Admin Actions</h5>
+            <a href="{% url 'company_edit' company.pk %}" class="btn btn-warning w-100 mb-2">Edit Company</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
