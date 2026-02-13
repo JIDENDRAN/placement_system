@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db import models
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
@@ -13,8 +14,17 @@ class CompanyListView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         if query:
-            return Company.objects.filter(name__icontains=query)
-        return Company.objects.all()
+            return Company.objects.filter(
+                models.Q(name__icontains=query) |
+                models.Q(industry__icontains=query) |
+                models.Q(location__icontains=query)
+            ).distinct().order_by('name')
+        return Company.objects.all().order_by('name')
+
+    def get_template_names(self):
+        if self.request.headers.get('HX-Request'):
+            return ['companies/_company_list_partial.html']
+        return [self.template_name]
 
 class CompanyDetailView(DetailView):
     model = Company

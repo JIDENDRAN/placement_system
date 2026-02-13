@@ -16,3 +16,6 @@ class AlumniProfileForm(forms.ModelForm):
     class Meta:
         model = AlumniProfile
         exclude = ('user',)
+
+class RoleLoginForm(AuthenticationForm):
+    role = forms.ChoiceField(choices=User.ROLE_CHOICES, widget=forms.RadioSelect, initial='STUDENT')

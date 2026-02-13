@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white p-4">
+                    <h3 class="fw-bold mb-0">Interview Feedback</h3>
+                    <p class="mb-0 opacity-75">Evaluating: {{ interview.student.username }} for {{ interview.topic }}
+                    </p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold small text-uppercase">Technical</label>
+                                <input type="number" name="technical_score" class="form-control" min="1" max="10"
+                                    required placeholder="1-10">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold small text-uppercase">Comm.</label>
+                                <input type="number" name="communication_score" class="form-control" min="1" max="10"
+                                    required placeholder="1-10">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold small text-uppercase">Problem Solving</label>
+                                <input type="number" name="problem_solving_score" class="form-control" min="1" max="10"
+                                    required placeholder="1-10">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold small text-uppercase">Behavioral</label>
+                                <input type="number" name="behavioral_score" class="form-control" min="1" max="10"
+                                    required placeholder="1-10">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Detailed Strengths</label>
+                            <textarea name="strengths" class="form-control" rows="3" required
+                                placeholder="What did the candidate do well?"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Areas of Improvement</label>
+                            <textarea name="areas_of_improvement" class="form-control" rows="3" required
+                                placeholder="Where can they improve?"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Overall Comments</label>
+                            <textarea name="overall_comments" class="form-control" rows="3" required
+                                placeholder="General feedback..."></textarea>
+                        </div>
+
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" id="isReady" name="is_ready">
+                            <label class="form-check-input-label fw-bold ms-2" for="isReady">
+                                Candidate is ready for the real interview
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary py-3 fw-bold">Submit Feedback & Complete
+                                Interview</button>
+                            <a href="{% url 'interview_detail' interview.pk %}" class="btn btn-light">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

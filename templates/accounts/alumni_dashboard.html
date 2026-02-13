@@ -5,16 +5,20 @@
 {% block content %}
 <div class="row">
     <div class="col-md-3">
-        <div class="card p-4 text-center mb-4">
+        <div class="card p-4 text-center mb-4 border-0 shadow-sm" style="border-radius: 20px;">
             <div class="mb-3">
-                <i class="bi bi-person-workspace fs-1 text-primary"></i>
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                    style="width: 80px; height: 80px;">
+                    <i class="bi bi-person-workspace fs-1"></i>
+                </div>
             </div>
-            <h5 class="fw-bold">{{ user.username }}</h5>
-            <p class="text-secondary mb-1">Alumni</p>
-            <p class="small text-muted mb-0">Helping students grow</p>
+            <h5 class="fw-bold">{{ user.get_full_name|default:user.username }}</h5>
+            <p class="text-secondary mb-1">Passout Year: {{ user.alumni_profile.passout_year|default:"N/A" }}</p>
+            <p class="small text-muted mb-0">Member since {{ user.date_joined|date:"Y" }}</p>
             <hr>
             <div class="d-grid gap-2">
-                <a href="{% url 'feedback_create' %}" class="btn btn-primary btn-sm">Submit New Feedback</a>
+                <a href="{% url 'feedback_create' %}" class="btn btn-primary btn-sm rounded-pill fw-bold">Submit New
+                    Feedback</a>
             </div>
         </div>
     </div>
@@ -24,32 +28,37 @@
 
         <div class="row mb-4">
             <div class="col-md-6">
-                <div class="card p-4 h-100">
+                <div class="card p-4 h-100 border-0 shadow-sm" style="border-radius: 20px;">
                     <h5 class="fw-bold mb-3">Your Contributions</h5>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Interview Feedbacks Shared</span>
-                        <span class="badge bg-primary rounded-pill">08</span>
+                        <span class="text-secondary">Interview Feedbacks Shared</span>
+                        <span class="badge bg-primary rounded-pill px-3">{{ feedbacks_count }}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span>Tips & Q&A Contributed</span>
-                        <span class="badge bg-success rounded-pill">24</span>
+                        <span class="text-secondary">Impact on Students</span>
+                        <span class="badge bg-success rounded-pill px-3">High</span>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card p-4 h-100 bg-light">
-                    <h5 class="fw-bold mb-2">Impact Score</h5>
-                    <h1 class="display-4 fw-bold text-primary mb-0">4.9/5</h1>
-                    <p class="text-secondary small">Based on student ratings of your feedback</p>
+                <div class="card p-4 h-100 border-0 shadow-sm bg-primary text-white"
+                    style="border-radius: 20px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                    <h5 class="fw-bold mb-2">Network Impact</h5>
+                    <h1 class="display-4 fw-bold mb-0">Top 5%</h1>
+                    <p class="small opacity-75">Your feedbacks are helping students prepare better for {{
+                        user.alumni_profile.placed_company }}!</p>
                 </div>
             </div>
         </div>
 
-        <div class="card p-4">
-            <h5 class="fw-bold mb-3">Recent Feedback Submissions</h5>
+        <div class="card p-4 border-0 shadow-sm" style="border-radius: 20px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Recent Feedback Submissions</h5>
+                <a href="{% url 'feedback_list' %}" class="small text-primary text-decoration-none fw-bold">View All</a>
+            </div>
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
                             <th>Company</th>
                             <th>Role</th>
@@ -58,18 +67,30 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for feedback in latest_feedbacks %}
                         <tr>
-                            <td>Google</td>
-                            <td>SDE-1</td>
-                            <td>Jan 12, 2026</td>
-                            <td><span class="badge bg-success">Selected</span></td>
+                            <td class="fw-bold text-dark">{{ feedback.company.name }}</td>
+                            <td class="text-secondary">{{ feedback.job_role }}</td>
+                            <td class="text-muted small">{{ feedback.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                {% if feedback.status == 'SELECTED' %}
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 border-0">Selected</span>
+                                {% elif feedback.status == 'REJECTED' %}
+                                <span
+                                    class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 border-0">Rejected</span>
+                                {% else %}
+                                <span
+                                    class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 border-0">Pending</span>
+                                {% endif %}
+                            </td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td>Amazon</td>
-                            <td>Cloud Support</td>
-                            <td>Dec 05, 2025</td>
-                            <td><span class="badge bg-success">Selected</span></td>
+                            <td colspan="4" class="text-center py-4 text-muted">You haven't shared any feedback yet.
+                            </td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'interview_list' %}">Interviews</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ interview.topic }}</li>
+        </ol>
+    </nav>
+
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold mb-0">{{ interview.topic }}</h2>
+                        <span
+                            class="badge {% if interview.status == 'SCHEDULED' %}bg-info{% elif interview.status == 'COMPLETED' %}bg-success{% else %}bg-secondary{% endif %} fs-6">
+                            {{ interview.status }}
+                        </span>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Student</h6>
+                            <p class="fs-5 mb-0">{{ interview.student.get_full_name|default:interview.student.username
+                                }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Interviewer</h6>
+                            <p class="fs-5 mb-0">{{
+                                interview.interviewer.get_full_name|default:interview.interviewer.username|default:"TBD"
+                                }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Date & Time</h6>
+                            <p class="fs-5 mb-0"><i class="far fa-calendar-alt me-2"></i>{{
+                                interview.scheduled_at|date:"F d, Y @ H:i" }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Duration</h6>
+                            <p class="fs-5 mb-0"><i class="far fa-clock me-2"></i>{{ interview.duration_minutes }}
+                                Minutes</p>
+                        </div>
+                    </div>
+
+                    {% if interview.meeting_link %}
+                    <div class="alert alert-primary d-flex align-items-center" role="alert">
+                        <i class="fas fa-video me-3 fs-4"></i>
+                        <div>
+                            <strong>Meeting Link Ready:</strong>
+                            <a href="{{ interview.meeting_link }}" target="_blank" class="alert-link ms-2">Join Video
+                                Interview</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if interview.notes and user == interview.interviewer %}
+                    <div class="mt-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-2">Notes (Private)</h6>
+                        <div class="bg-light p-3 rounded-3">{{ interview.notes|linebreaks }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if feedback %}
+            <div class="card border-0 shadow-sm bg-light mb-4">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4">Interview Feedback</h4>
+                    <div class="row text-center mb-4">
+                        <div class="col-3 border-end">
+                            <h2 class="fw-bold text-primary mb-0">{{ feedback.technical_score }}</h2>
+                            <small class="text-muted">Technical</small>
+                        </div>
+                        <div class="col-3 border-end">
+                            <h2 class="fw-bold text-primary mb-0">{{ feedback.communication_score }}</h2>
+                            <small class="text-muted">Communication</small>
+                        </div>
+                        <div class="col-3 border-end">
+                            <h2 class="fw-bold text-primary mb-0">{{ feedback.problem_solving_score }}</h2>
+                            <small class="text-muted">Problem Solving</small>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="fw-bold text-primary mb-0">{{ feedback.behavioral_score }}</h2>
+                            <small class="text-muted">Behavioral</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Strengths</h6>
+                        <p>{{ feedback.strengths|linebreaks }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Areas for Improvement</h6>
+                        <p>{{ feedback.areas_of_improvement|linebreaks }}</p>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold">Overall Verdict</h6>
+                        <p>{{ feedback.overall_comments|linebreaks }}</p>
+                    </div>
+
+                    {% if feedback.is_ready_for_real_interview %}
+                    <div class="badge bg-success p-2 px-3 mt-3">
+                        <i class="fas fa-check-circle me-1"></i> Ready for Real Interview
+                    </div>
+                    {% else %}
+                    <div class="badge bg-warning text-dark p-2 px-3 mt-3">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Needs More Preparation
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 2rem;">
+                {% if user == interview.interviewer or user.role == 'ADMIN' %}
+                {% if not feedback %}
+                <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-clipboard-check display-4 text-primary mb-3"></i>
+                        <h5 class="fw-bold">Ready to evaluate?</h5>
+                        <p class="text-muted">Submit your feedback to complete this interview process.</p>
+                        <a href="{% url 'submit_feedback' interview.pk %}" class="btn btn-primary w-100 py-2">
+                            Provide Feedback
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Target Company</h6>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                style="width: 48px; height: 48px;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ interview.company.name|default:"General Prep" }}</h6>
+                                <small class="text-muted">{{ interview.company.industry|default:"Mock Drive" }}</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="small text-muted mb-0">Prepare based on the company's previous year questions and
+                            technical requirements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

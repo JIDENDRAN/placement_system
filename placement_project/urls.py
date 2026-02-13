@@ -26,6 +26,7 @@ urlpatterns = [
     path('feedback/', include('feedback.urls')),
     path('mock-tests/', include('mock_tests.urls')),
     path('analytics/', include('analytics.urls')),
+    path('mock-interviews/', include('mock_interviews.urls')),
 ]
 
 if settings.DEBUG:

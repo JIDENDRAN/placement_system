@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'feedback',
     'mock_tests',
     'analytics',
+    'mock_interviews',
 ]
 
 MIDDLEWARE = [

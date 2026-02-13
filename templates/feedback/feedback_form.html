@@ -1,35 +1,77 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Submit Feedback - PlacementHub{% endblock %}
+{% block title %}Share Experience - PlacementHub{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card p-4">
-            <h3 class="fw-bold mb-4">Share Your Interview Experience</h3>
-            <p class="text-secondary mb-4">Your feedback helps fellow students prepare better. Thank you for
-                contributing!</p>
+    <div class="col-md-9">
+        <div class="card p-4 p-md-5 border-0 shadow-sm" style="border-radius: 24px;">
+            <div class="text-center mb-5">
+                <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                    style="width: 64px; height: 64px;">
+                    <i class="bi bi-chat-quote-fill fs-2"></i>
+                </div>
+                <h2 class="fw-bold text-dark">Share Your Interview Experience</h2>
+                <p class="text-muted">Your detailed feedback empowers the next batch of aspirants.</p>
+            </div>
+
             <form method="post">
                 {% csrf_token %}
+
+                <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">1. The Basics</h5>
                 <div class="row">
                     <div class="col-md-6">{{ form.company|as_crispy_field }}</div>
                     <div class="col-md-6">{{ form.job_role|as_crispy_field }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">{{ form.interview_date|as_crispy_field }}</div>
-                    <div class="col-md-6">{{ form.status|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form.salary_package|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form.interview_date|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form.status|as_crispy_field }}</div>
+                </div>
+
+                <h5 class="fw-bold mt-4 mb-4 text-primary border-bottom pb-2">2. Interview Structure & Content</h5>
+                <div class="row">
+                    <div class="col-md-4">{{ form.rounds_count|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form.placement_type|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form.interview_type|as_crispy_field }}</div>
                 </div>
                 {{ form.overall_difficulty|as_crispy_field }}
+                {{ form.core_technical_topics|as_crispy_field }}
                 {{ form.overall_experience|as_crispy_field }}
-                {{ form.tips|as_crispy_field }}
 
-                <div class="d-grid mt-4 gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">Submit Feedback</button>
-                    <a href="{% url 'feedback_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                <h5 class="fw-bold mt-4 mb-4 text-primary border-bottom pb-2">3. Advice & Culture</h5>
+                {{ form.tips|as_crispy_field }}
+                {{ form.culture_fit_advice|as_crispy_field }}
+
+                <div class="d-grid mt-5 gap-3">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill py-3 fw-bold shadow-sm">
+                        Publish My Experience
+                    </button>
+                    <a href="{% url 'feedback_list' %}"
+                        class="btn btn-link text-secondary text-decoration-none fw-bold">Discard & Go Back</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+        border-color: #2a5298;
+    }
+</style>
 {% endblock %}

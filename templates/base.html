@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,33 +16,42 @@
             font-family: 'Inter', sans-serif;
             background-color: #f8f9fa;
         }
+
         .navbar {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        .navbar-brand, .nav-link {
+
+        .navbar-brand,
+        .nav-link {
             color: white !important;
         }
+
         .card {
             border: none;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease;
         }
+
         .card:hover {
             transform: translateY(-5px);
         }
+
         .btn-primary {
             background-color: #2a5298;
             border: none;
         }
+
         .btn-primary:hover {
             background-color: #1e3c72;
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
+    {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
     <nav class="navbar navbar-expand-lg sticky-top mb-4">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{% url 'home' %}">
@@ -54,29 +64,46 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
                     {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'company_list' %}">Companies</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'feedback_list' %}">Feedbacks</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+
+                    {% if user.role == 'ADMIN' %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'company_list' %}">Companies</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'feedback_list' %}">Feedbacks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'test_list' %}">Mock Tests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'interview_list' %}">Mock Interviews</a></li>
+                    {% elif user.role == 'ALUMNI' %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'company_list' %}">Companies</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'feedback_list' %}">Feedbacks</a></li>
+                    {% elif user.role == 'STUDENT' %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'company_list' %}">Companies</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'feedback_list' %}">Feedbacks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'test_list' %}">Mock Tests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'interview_list' %}">Mock Interviews</a></li>
+                    {% endif %}
+
+                    <li class="nav-item"><a class="nav-link text-danger fw-bold" href="{% url 'logout' %}">Logout</a>
+                    </li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link btn btn-outline-light ms-lg-2" href="{% url 'register' %}">Register</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-outline-light ms-lg-2"
+                            href="{% url 'register' %}">Register</a></li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+    {% endif %}
 
     <div class="container min-vh-100">
         {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
         {% endif %}
-        
+
         {% block content %}{% endblock %}
     </div>
 
@@ -91,4 +118,5 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

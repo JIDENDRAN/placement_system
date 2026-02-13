@@ -1,79 +1,274 @@
 {% extends 'base.html' %}
 
-{% block title %}Feedback Details - {{ feedback.company.name }}{% endblock %}
+{% block title %}Interview Experience - {{ feedback.company.name }}{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb" class="mb-4">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'feedback_list' %}">Feedbacks</a></li>
-        <li class="breadcrumb-item active">{{ feedback.company.name }} - {{ feedback.job_role }}</li>
-    </ol>
-</nav>
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a href="{% url 'feedback_list' %}"
+                    class="text-decoration-none text-primary">Experiences</a></li>
+            <li class="breadcrumb-item active text-muted fw-semibold" aria-current="page">{{ feedback.company.name }} -
+                {{ feedback.job_role }}</li>
+        </ol>
+    </nav>
 
-<div class="row">
-    <div class="col-md-9">
-        <div class="card p-5 mb-4 border-0 shadow-sm">
-            <div class="d-flex justify-content-between align-items-start mb-4">
-                <div>
-                    <h1 class="fw-bold mb-1">{{ feedback.job_role }} @ {{ feedback.company.name }}</h1>
-                    <p class="text-secondary lead">Shared by {{ feedback.alumni.username }} | {{ feedback.interview_date
-                        }}</p>
-                </div>
-                <div class="text-end">
-                    <span
-                        class="badge bg-{% if feedback.status == 'SELECTED' %}success{% else %}danger{% endif %} px-3 py-2 fs-6">
-                        {{ feedback.status }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="row mb-5">
-                <div class="col-md-4">
-                    <div class="p-3 bg-light rounded text-center">
-                        <h6 class="text-secondary small fw-bold">DIFFICULTY</h6>
-                        <h4 class="mb-0">{{ feedback.get_overall_difficulty_display }}</h4>
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm p-4 p-md-5 mb-4 position-relative overflow-hidden"
+                style="border-radius: 24px; background: white;">
+                <!-- Header Card -->
+                <div class="d-flex flex-wrap justify-content-between align-items-start mb-4 gap-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span
+                                class="badge bg-primary bg-opacity-10 text-primary border-0 rounded-pill px-3 py-2 fw-bold">
+                                {{ feedback.job_role }}
+                            </span>
+                            <span
+                                class="badge bg-{% if feedback.status == 'SELECTED' %}success{% elif feedback.status == 'REJECTED' %}danger{% else %}warning{% endif %} bg-opacity-10 text-{% if feedback.status == 'SELECTED' %}success{% elif feedback.status == 'REJECTED' %}danger{% else %}warning{% endif %} border-0 px-3 py-2 rounded-pill fw-bold">
+                                <i class="bi bi-patch-check-fill me-1"></i>{{ feedback.get_status_display }}
+                            </span>
+                        </div>
+                        <h1 class="display-6 fw-bold text-dark mb-1">{{ feedback.company.name }} Interview Experience
+                        </h1>
+                        <p class="text-muted"><i class="bi bi-calendar-event me-2"></i>Interviewed on {{
+                            feedback.interview_date|date:"F d, Y" }}</p>
                     </div>
                 </div>
-            </div>
 
-            <h4 class="fw-bold mb-3">Overall Experience</h4>
-            <div class="mb-5" style="line-height: 1.8;">
-                {{ feedback.overall_experience|linebreaks }}
-            </div>
+                <!-- Verdict Summary Card -->
+                <div class="card bg-success bg-opacity-10 border-0 p-4 mb-5" style="border-radius: 20px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                            style="width: 48px; height: 48px; min-width: 48px;">
+                            <i class="bi bi-check-lg fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-success mb-1">Success Case Analysis</h5>
+                            <p class="text-dark opacity-75 small mb-0">The candidate successfully cleared {{
+                                feedback.rounds_count }} rounds with a <strong>{{
+                                    feedback.get_overall_difficulty_display }}</strong> difficulty rating.</p>
+                        </div>
+                    </div>
+                </div>
 
-            {% if feedback.rounds.all %}
-            <h4 class="fw-bold mb-4">Round-wise Breakdown</h4>
-            {% for round in feedback.rounds.all %}
-            <div class="card p-4 mb-3 border-start border-4 border-primary">
-                <h5 class="fw-bold">Round {{ round.round_number }}: {{ round.round_name }}</h5>
-                <p class="mb-3 text-secondary">{{ round.experience }}</p>
-                <h6 class="fw-bold mb-2">Questions Asked:</h6>
-                <div class="bg-light p-3 rounded">
-                    {{ round.questions_asked|linebreaks }}
+                <!-- Stats Quick View -->
+                <div class="row g-3 mb-5">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 border rounded-4 bg-light bg-opacity-50 text-center">
+                            <i class="bi bi-currency-dollar text-success fs-4 d-block mb-1"></i>
+                            <small class="text-muted d-block">Package</small>
+                            <span class="fw-bold">{{ feedback.salary_package|default:"N/A" }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 border rounded-4 bg-light bg-opacity-50 text-center">
+                            <i class="bi bi-layers text-primary fs-4 d-block mb-1"></i>
+                            <small class="text-muted d-block">Rounds</small>
+                            <span class="fw-bold">{{ feedback.rounds_count }} Rounds</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 border rounded-4 bg-light bg-opacity-50 text-center">
+                            <i class="bi bi-chat-text text-warning fs-4 d-block mb-1"></i>
+                            <small class="text-muted d-block">Platform</small>
+                            <span class="fw-bold">{{ feedback.get_placement_type_display }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 border rounded-4 bg-light bg-opacity-50 text-center">
+                            <i class="bi bi-laptop text-info fs-4 d-block mb-1"></i>
+                            <small class="text-muted d-block">Type</small>
+                            <span class="fw-bold">{{ feedback.get_interview_type_display }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Core Topics -->
+                {% if feedback.core_technical_topics %}
+                <div class="mb-5">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-tags-fill text-primary me-2"></i>Core Technical
+                        Focus</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for topic in feedback.core_technical_topics.split|slice:":20" %}
+                        <span class="bg-white border rounded-pill px-3 py-2 text-dark small fw-medium shadow-sm">
+                            # {{ topic|cut:"," }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Detailed Narrative -->
+                <div class="mb-5">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-journal-text text-primary me-2"></i>Detailed
+                        Experience Overview</h5>
+                    <div class="lh-lg text-secondary" style="font-size: 1.05rem;">
+                        {{ feedback.overall_experience|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Roundup of Rounds -->
+                {% if feedback.rounds.all %}
+                <div class="mb-5">
+                    <h5 class="fw-bold text-dark mb-4"><i class="bi bi-diagram-3-fill text-primary me-2"></i>The
+                        Selection Process</h5>
+                    <div class="round-timeline position-relative ps-4 border-start border-2 border-light">
+                        {% for round in feedback.rounds.all %}
+                        <div class="round-item mb-5 position-relative">
+                            <div class="round-marker position-absolute rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                style="width: 32px; height: 32px; left: -49px; top: 0; font-size: 14px;">
+                                {{ round.round_number }}
+                            </div>
+                            <div class="card border-0 shadow-sm p-4 bg-light rounded-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold text-dark mb-0 fs-5">{{ round.round_name }}</h6>
+                                </div>
+                                <div class="mb-3 text-secondary">
+                                    {{ round.experience|linebreaks }}
+                                </div>
+                                {% if round.questions_asked %}
+                                <div class="bg-white p-3 rounded-3 border">
+                                    <label class="small text-uppercase fw-bold text-muted mb-2 d-block">Key Questions
+                                        Asked:</label>
+                                    <div class="text-dark">
+                                        {{ round.questions_asked|linebreaks }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Hiring Focus & Key Takeaways -->
+                <div class="mb-5 p-4 border rounded-4 bg-light bg-opacity-25">
+                    <h5 class="fw-bold text-dark mb-3">Key Case Takeaways</h5>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <span class="fw-bold small text-uppercase">Top Perceived Skill</span>
+                            </div>
+                            <p class="mb-0 text-secondary">Communication & Problem Solving</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-clock-history text-primary"></i>
+                                <span class="fw-bold small text-uppercase">Interview Duration</span>
+                            </div>
+                            <p class="mb-0 text-secondary">Approx. 4-5 Hours total</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-graph-up-arrow text-success"></i>
+                                <span class="fw-bold small text-uppercase">Hiring Bar</span>
+                            </div>
+                            <p class="mb-0 text-secondary">High (Technical + Behavioral)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advice Cards -->
+                <div class="row g-4 mt-2">
+                    {% if feedback.tips %}
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm p-4 bg-primary text-white"
+                            style="border-radius: 20px;">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-lightbulb-fill me-2"></i>Preparation Advice</h5>
+                            <p class="mb-0 opacity-90 lh-lg">{{ feedback.tips }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if feedback.culture_fit_advice %}
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm p-4 bg-dark text-white" style="border-radius: 20px;">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-people-fill me-2"></i>Culture & Fit</h5>
+                            <p class="mb-0 opacity-90 lh-lg">{{ feedback.culture_fit_advice }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endfor %}
-            {% endif %}
-
-            {% if feedback.tips %}
-            <div class="card p-4 bg-primary text-white border-0 mt-5">
-                <h5 class="fw-bold mb-3"><i class="bi bi-lightbulb me-2"></i>Advice for Aspirants</h5>
-                <p class="mb-0">{{ feedback.tips }}</p>
-            </div>
-            {% endif %}
         </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="card p-4 text-center">
-            <h5 class="fw-bold mb-3">About the Alumni</h5>
-            <div class="mb-3"><i class="bi bi-person-circle fs-1 text-secondary"></i></div>
-            <h6>{{ feedback.alumni.username }}</h6>
-            <p class="small text-muted mb-0">Class of {{ feedback.alumni.alumni_profile.passout_year }}</p>
-            <hr>
-            <a href="{{ feedback.alumni.alumni_profile.linkedin_link }}" class="btn btn-outline-primary btn-sm"><i
-                    class="bi bi-linkedin me-2"></i>Connect</a>
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm p-4 text-center mb-4" style="border-radius: 20px;">
+                <label class="small text-uppercase fw-bold text-muted mb-3 d-block">Share by Alumni</label>
+                <div class="mb-3">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                        style="width: 80px; height: 80px;">
+                        <i class="bi bi-person-badge fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">{{ feedback.alumni.get_full_name|default:feedback.alumni.username
+                        }}</h5>
+                    <p class="text-muted small">
+                        {{ feedback.alumni.alumni_profile.designation|default:"Alumni" }}
+                        {% if feedback.alumni.alumni_profile.placed_company %}
+                        at {{ feedback.alumni.alumni_profile.placed_company }}
+                        {% endif %}
+                    </p>
+                </div>
+                <hr>
+                <div class="d-grid gap-2">
+                    {% if feedback.alumni.alumni_profile.linkedin_link %}
+                    <a href="{{ feedback.alumni.alumni_profile.linkedin_link }}" target="_blank"
+                        class="btn btn-outline-primary rounded-pill fw-bold py-2">
+                        <i class="bi bi-linkedin me-2"></i>Connect on LinkedIn
+                    </a>
+                    {% else %}
+                    <button class="btn btn-outline-secondary rounded-pill fw-bold py-2" disabled>
+                        <i class="bi bi-envelope me-2"></i>Contact Alumni
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 20px;">
+                <h6 class="fw-bold text-dark mb-3">Pro Prep Checklist</h6>
+                <div class="list-group list-group-flush small">
+                    <div class="list-group-item border-0 px-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i> Review Core Concepts
+                    </div>
+                    <div class="list-group-item border-0 px-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i> Master Leadership Principles
+                    </div>
+                    <div class="list-group-item border-0 px-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-circle text-muted"></i> Practice Live Mock Interview
+                    </div>
+                    <div class="list-group-item border-0 px-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-circle text-muted"></i> Build a Strong Project Portfolio
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'test_list' %}" class="btn btn-primary w-100 rounded-pill fw-bold btn-sm">Start
+                        Preparation</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .round-marker::after {
+        content: '';
+        position: absolute;
+        bottom: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 60px;
+        background: #f1f3f5;
+    }
+
+    .round-item:last-child .round-marker::after {
+        display: none;
+    }
+</style>
 {% endblock %}

@@ -4,13 +4,22 @@ from django.contrib.auth.decorators import login_required
 from .models import MockTest, Question, StudentAttempt
 from django.contrib import messages
 
-class TestListView(ListView):
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+class TestListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = MockTest
     template_name = 'mock_tests/test_list.html'
     context_object_name = 'tests'
 
+    def test_func(self):
+        return self.request.user.role in ['ADMIN', 'STUDENT']
+
 @login_required
 def take_test(request, pk):
+    if request.user.role not in ['ADMIN', 'STUDENT']:
+        messages.error(request, "Access denied. Only students can take mock tests.")
+        return redirect('dashboard')
+        
     test = get_object_or_404(MockTest, pk=pk)
     questions = test.questions.all()
     
@@ -35,5 +44,8 @@ def take_test(request, pk):
 
 @login_required
 def test_history(request):
+    if request.user.role not in ['ADMIN', 'STUDENT']:
+        messages.error(request, "Access denied.")
+        return redirect('dashboard')
     attempts = StudentAttempt.objects.filter(student=request.user).order_by('-completed_at')
     return render(request, 'mock_tests/test_history.html', {'attempts': attempts})

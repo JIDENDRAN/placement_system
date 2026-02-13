@@ -14,11 +14,32 @@ class InterviewFeedback(models.Model):
     alumni = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='feedbacks')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='feedbacks')
     job_role = models.CharField(max_length=200)
+    salary_package = models.CharField(max_length=100, help_text="e.g. 12 LPA", blank=True, null=True)
     interview_date = models.DateField()
+    rounds_count = models.IntegerField(default=1, help_text="Total number of rounds")
+    core_technical_topics = models.TextField(help_text="Comma separated topics like React, AWS, OS", blank=True, null=True)
+    
+    PLACEMENT_TYPE_CHOICES = (
+        ('ON', 'On-Campus'),
+        ('OFF', 'Off-Campus'),
+        ('REF', 'Referral'),
+        ('INT', 'Internal/Other'),
+    )
+    placement_type = models.CharField(max_length=3, choices=PLACEMENT_TYPE_CHOICES, default='ON')
+    
+    INTERVIEW_TYPE_CHOICES = (
+        ('TECH', 'Technical'),
+        ('HR', 'HR'),
+        ('BOTH', 'Technical + HR'),
+        ('MNG', 'Managerial'),
+    )
+    interview_type = models.CharField(max_length=4, choices=INTERVIEW_TYPE_CHOICES, default='TECH')
+    
     overall_experience = models.TextField()
     overall_difficulty = models.IntegerField(choices=DIFFICULTY_CHOICES, default=3)
     status = models.CharField(max_length=50, choices=(('SELECTED', 'Selected'), ('REJECTED', 'Rejected'), ('PENDING', 'Pending')), default='SELECTED')
-    tips = models.TextField(blank=True, null=True)
+    tips = models.TextField(help_text="General preparation advice", blank=True, null=True)
+    culture_fit_advice = models.TextField(help_text="What is the company culture like?", blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
 
