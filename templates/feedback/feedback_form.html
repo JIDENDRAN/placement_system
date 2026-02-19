@@ -1,10 +1,4 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-
-{% block title %}Share Experience - PlacementHub{% endblock %}
-
-{% block content %}
-<div class="row justify-content-center">
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block title %}Share Experience - PlacementHub{% endblock %} {% block content %} <div class="row justify-content-center">
     <div class="col-md-9">
         <div class="card p-4 p-md-5 border-0 shadow-sm" style="border-radius: 24px;">
             <div class="text-center mb-5">
@@ -16,10 +10,7 @@
                 <p class="text-muted">Your detailed feedback empowers the next batch of aspirants.</p>
             </div>
 
-            <form method="post">
-                {% csrf_token %}
-
-                <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">1. The Basics</h5>
+            <form method="post"> {% csrf_token %} <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">1. The Basics</h5>
                 <div class="row">
                     <div class="col-md-6">{{ form.company|as_crispy_field }}</div>
                     <div class="col-md-6">{{ form.job_role|as_crispy_field }}</div>
@@ -73,5 +64,4 @@
         box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
         border-color: #2a5298;
     }
-</style>
-{% endblock %}
+</style> {% endblock %}

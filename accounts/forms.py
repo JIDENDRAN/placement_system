@@ -5,7 +5,7 @@ from .models import User, StudentProfile, AlumniProfile
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = UserCreationForm.Meta.fields + ('role', 'email')
+        fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'role', 'email')
 
 class StudentProfileForm(forms.ModelForm):
     class Meta:

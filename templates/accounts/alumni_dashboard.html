@@ -1,9 +1,4 @@
-{% extends 'base.html' %}
-
-{% block title %}Alumni Dashboard - PlacementHub{% endblock %}
-
-{% block content %}
-<div class="row">
+{% extends 'base.html' %} {% block title %}Alumni Dashboard - PlacementHub{% endblock %} {% block content %} <div class="row">
     <div class="col-md-3">
         <div class="card p-4 text-center mb-4 border-0 shadow-sm" style="border-radius: 20px;">
             <div class="mb-3">
@@ -45,8 +40,8 @@
                     style="border-radius: 20px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
                     <h5 class="fw-bold mb-2">Network Impact</h5>
                     <h1 class="display-4 fw-bold mb-0">Top 5%</h1>
-                    <p class="small opacity-75">Your feedbacks are helping students prepare better for {{
-                        user.alumni_profile.placed_company }}!</p>
+                    <p class="small opacity-75">Your feedbacks are helping students prepare better for {% if shared_companies %} {% for company in shared_companies %} {{ company }}{% if not forloop.last %}, {% endif %} {% endfor %} {% elif user.alumni_profile.placed_company %} {{ user.alumni_profile.placed_company }} {% else %} top companies {% endif %}!
+                    </p>
                 </div>
             </div>
         </div>
@@ -66,35 +61,20 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for feedback in latest_feedbacks %}
-                        <tr>
+                    <tbody> {% for feedback in latest_feedbacks %} <tr>
                             <td class="fw-bold text-dark">{{ feedback.company.name }}</td>
                             <td class="text-secondary">{{ feedback.job_role }}</td>
                             <td class="text-muted small">{{ feedback.created_at|date:"M d, Y" }}</td>
-                            <td>
-                                {% if feedback.status == 'SELECTED' %}
-                                <span
-                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 border-0">Selected</span>
-                                {% elif feedback.status == 'REJECTED' %}
-                                <span
-                                    class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 border-0">Rejected</span>
-                                {% else %}
-                                <span
-                                    class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 border-0">Pending</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
+                            <td> {% if feedback.status == 'SELECTED' %} <span
+                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 border-0">Selected</span> {% elif feedback.status == 'REJECTED' %} <span
+                                    class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 border-0">Rejected</span> {% else %} <span
+                                    class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 border-0">Pending</span> {% endif %} </td>
+                        </tr> {% empty %} <tr>
                             <td colspan="4" class="text-center py-4 text-muted">You haven't shared any feedback yet.
                             </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+                        </tr> {% endfor %} </tbody>
                 </table>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</div> {% endblock %}

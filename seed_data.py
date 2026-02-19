@@ -49,6 +49,11 @@ def seed():
     )
     alumni1.set_password('alumni123')
     alumni1.save()
+    from accounts.models import AlumniProfile
+    AlumniProfile.objects.get_or_create(
+        user=alumni1,
+        defaults={'placed_company': 'Google', 'designation': 'Software Engineer', 'passout_year': 2024}
+    )
     
     alumni2, _ = User.objects.get_or_create(
         username='sneha.reddy',
@@ -56,6 +61,10 @@ def seed():
     )
     alumni2.set_password('alumni123')
     alumni2.save()
+    AlumniProfile.objects.get_or_create(
+        user=alumni2,
+        defaults={'placed_company': 'Microsoft', 'designation': 'Software Development Engineer', 'passout_year': 2024}
+    )
 
     # ============= COMPANIES =============
     print("🏢 Creating companies...")

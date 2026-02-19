@@ -1,9 +1,4 @@
-{% extends 'base.html' %}
-
-{% block title %}Explore Companies - PlacementHub{% endblock %}
-
-{% block content %}
-<div class="row mb-5 align-items-center">
+{% extends 'base.html' %} {% block title %}Explore Companies - PlacementHub{% endblock %} {% block content %} <div class="row mb-5 align-items-center">
     <div class="col-md-7">
         <h1 class="fw-bold text-dark display-6 mb-2">Explore Companies</h1>
         <p class="text-muted lead pb-0 mb-0">Discover top recruiters and their recruitment details.</p>
@@ -26,9 +21,7 @@
     </div>
 </div>
 
-<div id="company-results-container">
-    {% include 'companies/_company_list_partial.html' %}
-</div>
+<div id="company-results-container"> {% include 'companies/_company_list_partial.html' %} </div>
 
 <style>
     .pagination .page-link {
@@ -56,5 +49,4 @@
     .htmx-request .htmx-indicator {
         opacity: 1;
     }
-</style>
-{% endblock %}
+</style> {% endblock %}

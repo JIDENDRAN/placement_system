@@ -1,0 +1,59 @@
+{% extends 'base.html' %} {% block title %}User Management - PlacementHub{% endblock %} {% block content %} <div class="row">
+    <div class="col-md-12 mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold">User Management</h2>
+            <p class="text-secondary">Activate or block users based on their activity.</p>
+        </div>
+        <form class="d-flex" method="GET" action="{% url 'user_list' %}">
+            <input class="form-control me-2 rounded-pill" type="search" name="q" placeholder="Search by name/email"
+                aria-label="Search" value="{{ request.GET.q }}">
+            <button class="btn btn-primary rounded-pill px-4" type="submit">Search</button>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm" style="border-radius: 20px;">
+    <div class="table-responsive p-4">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody> {% for user_obj in users %} <tr>
+                    <td>
+                        <div class="d-flex align-items-center"> {% if user_obj.profile_picture %} <img src="{{ user_obj.profile_picture.url }}" class="rounded-circle me-3"
+                                style="width: 40px; height: 40px; object-fit: cover;"> {% else %} <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3"
+                                style="width: 40px; height: 40px;">
+                                <i class="bi bi-person text-secondary"></i>
+                            </div> {% endif %} <div>
+                                <div class="fw-bold">{{ user_obj.get_full_name|default:user_obj.username }}</div>
+                                <small class="text-muted">@{{ user_obj.username }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ user_obj.email }}</td>
+                    <td>
+                        <span
+                            class="badge {% if user_obj.role == 'ADMIN' %}bg-danger{% elif user_obj.role == 'ALUMNI' %}bg-success{% else %}bg-primary{% endif %} bg-opacity-10 {% if user_obj.role == 'ADMIN' %}text-danger{% elif user_obj.role == 'ALUMNI' %}text-success{% else %}text-primary{% endif %} px-3 rounded-pill border-0">
+                            {{ user_obj.get_role_display }}
+                        </span>
+                    </td>
+                    <td> {% if user_obj.is_active %} <span
+                            class="badge bg-success bg-opacity-10 text-success px-3 rounded-pill border-0">Active</span> {% else %} <span
+                            class="badge bg-danger bg-opacity-10 text-danger px-3 rounded-pill border-0">Blocked</span> {% endif %} </td>
+                    <td class="text-muted small">{{ user_obj.date_joined|date:"d M, Y" }}</td>
+                    <td class="text-end"> {% if not user_obj.is_superuser %} <a href="{% url 'toggle_user_status' user_obj.id %}"
+                            class="btn {% if user_obj.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %} btn-sm rounded-pill px-3"> {% if user_obj.is_active %}<i class="bi bi-person-slash me-1"></i> Block{% else %}<i
+                                class="bi bi-person-check me-1"></i> Activate{% endif %} </a> {% endif %} </td>
+                </tr> {% empty %} <tr>
+                    <td colspan="6" class="text-center py-5 text-secondary">No users found.</td>
+                </tr> {% endfor %} </tbody>
+        </table>
+    </div>
+</div> {% endblock %}

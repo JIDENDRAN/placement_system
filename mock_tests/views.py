@@ -12,12 +12,12 @@ class TestListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     context_object_name = 'tests'
 
     def test_func(self):
-        return self.request.user.role in ['ADMIN', 'STUDENT']
+        return self.request.user.role in ['ADMIN', 'STUDENT', 'ALUMNI']
 
 @login_required
 def take_test(request, pk):
-    if request.user.role not in ['ADMIN', 'STUDENT']:
-        messages.error(request, "Access denied. Only students can take mock tests.")
+    if request.user.role not in ['ADMIN', 'STUDENT', 'ALUMNI']:
+        messages.error(request, "Access denied. Only students and alumni can take mock tests.")
         return redirect('dashboard')
         
     test = get_object_or_404(MockTest, pk=pk)
@@ -44,7 +44,7 @@ def take_test(request, pk):
 
 @login_required
 def test_history(request):
-    if request.user.role not in ['ADMIN', 'STUDENT']:
+    if request.user.role not in ['ADMIN', 'STUDENT', 'ALUMNI']:
         messages.error(request, "Access denied.")
         return redirect('dashboard')
     attempts = StudentAttempt.objects.filter(student=request.user).order_by('-completed_at')

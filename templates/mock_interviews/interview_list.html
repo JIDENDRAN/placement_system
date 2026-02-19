@@ -1,9 +1,7 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Mock Interviews</h2>
+        <h2 class="fw-bold">Interviews</h2>
         {% if user.role == 'ADMIN' %}
         <a href="{% url 'schedule_interview' %}" class="btn btn-primary shadow-sm">
             <i class="fas fa-calendar-plus me-2"></i>Schedule Interview
@@ -14,21 +12,25 @@
     <div class="row g-4">
         {% for interview in interviews %}
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 border-0 shadow-sm hover-lift">
-                <div class="card-body">
+            <div class="card h-100 border-0 shadow-sm hover-lift" style="border-radius: 20px;">
+                <div class="card-body p-4">
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="badge {% if interview.status == 'SCHEDULED' %}bg-info{% elif interview.status == 'COMPLETED' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill">
+                        <span
+                            class="badge {% if interview.status == 'SCHEDULED' %}bg-info{% elif interview.status == 'COMPLETED' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill">
                             {{ interview.status }}
                         </span>
-                        <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>{{ interview.scheduled_at|date:"M d, Y H:i" }}</small>
+                        <small class="text-muted">
+                            <i class="far fa-calendar-alt me-1"></i>{{ interview.formatted_date }}
+                        </small>
                     </div>
-                    <h5 class="card-title fw-bold">{{ interview.topic }}</h5>
-                    <p class="card-text text-muted mb-3">
-                        <strong>Student:</strong> {{ interview.student.get_full_name|default:interview.student.username }}<br>
-                        <strong>Interviewer:</strong> {{ interview.interviewer.get_full_name|default:interview.interviewer.username|default:"Not Assigned" }}
-                    </p>
+                    <h5 class="card-title fw-bold mb-3">{{ interview.topic }}</h5>
+                    <div class="card-text text-muted mb-4 small">
+                        <div class="mb-1"><strong>Student:</strong> {{ interview.student_name }}</div>
+                        <div><strong>Interviewer:</strong> {{ interview.interviewer_name }}</div>
+                    </div>
                     <div class="d-grid">
-                        <a href="{% url 'interview_detail' interview.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                        <a href="{% url 'interview_detail' interview.pk %}"
+                            class="btn btn-outline-primary btn-sm rounded-pill font-weight-bold">View Details</a>
                     </div>
                 </div>
             </div>
@@ -49,9 +51,10 @@
     .hover-lift {
         transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .hover-lift:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
     }
 </style>
 {% endblock %}

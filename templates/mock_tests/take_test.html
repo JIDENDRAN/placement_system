@@ -4,78 +4,216 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card p-4 mb-4 bg-dark text-white border-0 sticky-top" style="top: 80px; z-index: 1000;">
-            <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mb-0 fw-bold">{{ test.title }}</h4>
-                <div id="timer" class="fs-5 fw-bold"><i class="bi bi-stopwatch me-2"></i>--:--</div>
+    <div class="col-lg-9">
+        <!-- Floating Header with Timer -->
+        <div class="card border-0 shadow-lg p-4 mb-5 sticky-top bg-dark text-white overflow-hidden shadow-lg"
+            style="top: 85px; z-index: 1000; border-radius: 20px;">
+            <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                <i class="bi bi-stopwatch" style="font-size: 4rem;"></i>
+            </div>
+            <div class="row align-items-center position-relative">
+                <div class="col-md-8">
+                    <span class="badge bg-primary rounded-pill px-3 py-2 mb-2">Live Assessment</span>
+                    <h3 class="mb-0 fw-bold">{{ test.title }}</h3>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div id="timer" class="display-6 fw-bold text-warning">
+                        <i class="bi bi-clock-history me-2"></i>--:--
+                    </div>
+                </div>
+            </div>
+            <!-- Progress Bar -->
+            <div class="progress position-absolute bottom-0 start-0 w-100 rounded-0"
+                style="height: 6px; background: rgba(255,255,255,0.1);">
+                <div id="testProgress" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
             </div>
         </div>
 
-        <form method="post" id="testForm">
+        <form method="post" id="testForm" class="needs-validation" novalidate>
             {% csrf_token %}
             {% for question in questions %}
-            <div class="card p-4 mb-4">
-                <h5 class="fw-bold mb-4">Question {{ forloop.counter }}</h5>
-                <p class="lead mb-4">{{ question.text }}</p>
+            <div class="card border-0 shadow-sm p-4 p-md-5 mb-4 rounded-4 question-card"
+                data-question-num="{{ forloop.counter }}">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-4 py-2 fw-bold">
+                        Question {{ forloop.counter }} of {{ questions|length }}
+                    </span>
+                    <span class="text-muted small fw-medium">
+                        <i class="bi bi-award me-1"></i>{{ question.marks }} Mark{{ question.marks|pluralize }}
+                    </span>
+                </div>
 
-                <div class="form-check mb-3 p-3 border rounded">
-                    <input class="form-check-input ms-0 me-3" type="radio" name="question_{{ question.id }}"
-                        id="q{{ question.id }}a" value="A" required>
-                    <label class="form-check-label w-100" for="q{{ question.id }}a">
-                        {{ question.option_a }}
-                    </label>
-                </div>
-                <div class="form-check mb-3 p-3 border rounded">
-                    <input class="form-check-input ms-0 me-3" type="radio" name="question_{{ question.id }}"
-                        id="q{{ question.id }}b" value="B">
-                    <label class="form-check-label w-100" for="q{{ question.id }}b">
-                        {{ question.option_b }}
-                    </label>
-                </div>
-                <div class="form-check mb-3 p-3 border rounded">
-                    <input class="form-check-input ms-0 me-3" type="radio" name="question_{{ question.id }}"
-                        id="q{{ question.id }}c" value="C">
-                    <label class="form-check-label w-100" for="q{{ question.id }}c">
-                        {{ question.option_c }}
-                    </label>
-                </div>
-                <div class="form-check mb-3 p-3 border rounded">
-                    <input class="form-check-input ms-0 me-3" type="radio" name="question_{{ question.id }}"
-                        id="q{{ question.id }}d" value="D">
-                    <label class="form-check-label w-100" for="q{{ question.id }}d">
-                        {{ question.option_d }}
-                    </label>
+                <h4 class="fw-bold text-dark mb-5 lh-base">{{ question.text }}</h4>
+
+                <div class="options-group">
+                    <div class="option-item mb-3">
+                        <input class="btn-check" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}a"
+                            value="A" required>
+                        <label
+                            class="btn btn-outline-light text-dark text-start w-100 p-4 border-2 rounded-4 shadow-none d-flex align-items-center"
+                            for="q{{ question.id }}a">
+                            <span class="option-label me-3">A</span>
+                            <span class="fw-medium">{{ question.option_a }}</span>
+                        </label>
+                    </div>
+
+                    <div class="option-item mb-3">
+                        <input class="btn-check" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}b"
+                            value="B">
+                        <label
+                            class="btn btn-outline-light text-dark text-start w-100 p-4 border-2 rounded-4 shadow-none d-flex align-items-center"
+                            for="q{{ question.id }}b">
+                            <span class="option-label me-3">B</span>
+                            <span class="fw-medium">{{ question.option_b }}</span>
+                        </label>
+                    </div>
+
+                    <div class="option-item mb-3">
+                        <input class="btn-check" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}c"
+                            value="C">
+                        <label
+                            class="btn btn-outline-light text-dark text-start w-100 p-4 border-2 rounded-4 shadow-none d-flex align-items-center"
+                            for="q{{ question.id }}c">
+                            <span class="option-label me-3">C</span>
+                            <span class="fw-medium">{{ question.option_c }}</span>
+                        </label>
+                    </div>
+
+                    <div class="option-item mb-3">
+                        <input class="btn-check" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}d"
+                            value="D">
+                        <label
+                            class="btn btn-outline-light text-dark text-start w-100 p-4 border-2 rounded-4 shadow-none d-flex align-items-center"
+                            for="q{{ question.id }}d">
+                            <span class="option-label me-3">D</span>
+                            <span class="fw-medium">{{ question.option_d }}</span>
+                        </label>
+                    </div>
                 </div>
             </div>
             {% endfor %}
 
-            <div class="d-grid gap-2 mb-5">
-                <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">Submit Assessment</button>
+            <div class="card border-0 shadow-lg p-5 mb-5 text-center bg-primary text-white"
+                style="border-radius: 24px;">
+                <h3 class="fw-bold mb-3">Finished all questions?</h3>
+                <p class="opacity-75 mb-4 px-md-5">Please double-check your answers. Once submitted, you cannot change
+                    your responses.</p>
+                <div class="d-grid gap-2 col-md-6 mx-auto">
+                    <button type="submit" class="btn btn-white btn-lg py-3 fw-bold rounded-pill text-primary"
+                        style="background: white; border: none;">
+                        Submit Final Assessment
+                    </button>
+                </div>
             </div>
         </form>
     </div>
 </div>
+
+<style>
+    .option-label {
+        width: 36px;
+        height: 36px;
+        background: #f1f3f5;
+        color: #adb5bd;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .btn-outline-light:hover {
+        background-color: #f8f9fa !important;
+        border-color: #2a5298 !important;
+        color: #2a5298 !important;
+    }
+
+    .btn-outline-light:hover .option-label {
+        background: #2a5298 !important;
+        color: white !important;
+    }
+
+    .btn-check:checked+.btn-outline-light {
+        background-color: #f0f4ff !important;
+        border-color: #2a5298 !important;
+        box-shadow: 0 4px 15px rgba(42, 82, 152, 0.1) !important;
+    }
+
+    .btn-check:checked+.btn-outline-light .option-label {
+        background: #2a5298 !important;
+        color: white !important;
+    }
+
+    .btn-white:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .question-card {
+        transition: transform 0.3s ease;
+    }
+
+    .question-card:hover {
+        transform: translateX(5px);
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    // Timer Logic
     let duration = {{ test.duration_minutes }} * 60;
     const timerDisplay = document.getElementById('timer');
     const form = document.getElementById('testForm');
+    const progressBar = document.getElementById('testProgress');
+    const startDuration = duration;
 
     const countdown = setInterval(() => {
         let minutes = Math.floor(duration / 60);
         let seconds = duration % 60;
 
-        timerDisplay.innerHTML = `<i class="bi bi-stopwatch me-2"></i>${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        timerDisplay.innerHTML = `<i class="bi bi-clock-history me-2"></i>${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+        // Update Progress Bar based on time
+        let progress = ((startDuration - duration) / startDuration) * 100;
+        progressBar.style.width = progress + '%';
+
+        if (duration <= 300) { // Warning at 5 minutes
+            timerDisplay.classList.add('text-danger');
+            timerDisplay.classList.remove('text-warning');
+        }
 
         if (duration <= 0) {
             clearInterval(countdown);
-            alert("Time's up! Your test will be submitted automatically.");
-            form.submit();
+            Swal.fire({
+                title: "Time's up!",
+                text: "Your assessment is being submitted automatically.",
+                icon: "warning",
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                form.submit();
+            });
         }
         duration--;
     }, 1000);
+
+    // Prevent accidental back navigation
+    window.onbeforeunload = function () {
+        return "Are you sure you want to leave? Your progress will be lost.";
+    };
+
+    form.onsubmit = function () {
+        window.onbeforeunload = null;
+    };
+
+    // Form Validation Interaction
+    document.querySelectorAll('.btn-check').forEach(radio => {
+        radio.addEventListener('change', () => {
+            const card = radio.closest('.question-card');
+            card.style.borderLeft = "10px solid #198754";
+        });
+    });
 </script>
 {% endblock %}

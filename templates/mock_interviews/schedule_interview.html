@@ -1,21 +1,112 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
+{% block title %}Schedule Mock Interview - PlacementHub{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm p-4">
-                <h2 class="fw-bold mb-4">Schedule Mock Interview</h2>
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary py-2">Schedule Session</button>
-                    </div>
-                </form>
+<div class="row justify-content-center py-5">
+    <div class="col-lg-7">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                style="width: 80px; height: 80px;">
+                <i class="bi bi-calendar-plus display-5"></i>
             </div>
+            <h2 class="fw-bold text-dark">Arrange Mock Interview</h2>
+            <p class="text-secondary lead">Connect students with expert alumni for real-world practice.</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="card border-0 shadow-lg p-4 p-md-5" style="border-radius: 30px;">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+                <div class="row g-4">
+                    <!-- Target Student -->
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                            {{ form.student|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <!-- Interviewer & Company -->
+                    <div class="col-md-6">
+                        {{ form.interviewer|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.company|as_crispy_field }}
+                    </div>
+
+                    <!-- Topic -->
+                    <div class="col-md-12">
+                        {{ form.topic|as_crispy_field }}
+                    </div>
+
+                    <!-- Date & Time Picker -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-4 border-start border-4 border-warning">
+                            <label class="form-label fw-bold small text-uppercase text-muted mb-2">
+                                <i class="bi bi-clock me-1"></i>Date & Time Selection
+                            </label>
+                            {{ form.scheduled_at }}
+                        </div>
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="col-md-6">
+                        {{ form.duration_minutes|as_crispy_field }}
+                    </div>
+
+                    <!-- Meeting Link -->
+                    <div class="col-md-12">
+                        {{ form.meeting_link|as_crispy_field }}
+                    </div>
+                </div>
+
+                <hr class="my-5 opacity-10">
+
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <a href="{% url 'interview_list' %}" class="btn btn-light rounded-pill px-4 fw-bold w-100">
+                            Cancel & Go Back
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary rounded-pill py-3 fw-bold shadow-lg w-100">
+                            Confirm & Schedule Session <i class="bi bi-check2-circle ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tooltip Card -->
+        <div class="mt-5 bg-dark text-white p-4 text-center shadow-sm" style="border-radius: 20px;">
+            <p class="mb-0 small opacity-75">
+                <i class="bi bi-info-circle-fill text-info me-2"></i>
+                An automated notification will be sent to both the student and the interviewer upon scheduling.
+            </p>
         </div>
     </div>
 </div>
+
+<style>
+    .form-control,
+    .form-select {
+        border-radius: 12px !important;
+        padding: 0.75rem 1rem !important;
+        border: 2px solid #f1f3f5 !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #2a5298 !important;
+        box-shadow: none !important;
+    }
+
+    label {
+        font-weight: 600;
+        color: #495057;
+    }
+</style>
 {% endblock %}

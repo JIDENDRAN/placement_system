@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from .forms import CustomUserCreationForm, RoleLoginForm
+from .models import User
 from django.contrib import messages
 
 class CustomLoginView(LoginView):
@@ -33,13 +34,55 @@ def register_view(request):
 def dashboard_view(request):
     user = request.user
     if user.role == 'ADMIN':
-        return render(request, 'accounts/admin_dashboard.html')
+        from companies.models import Company
+        from django.utils import timezone
+        from django.db.models.functions import ExtractMonth
+        from django.db.models import Count
+        import calendar
+
+        total_students = User.objects.filter(role='STUDENT').count()
+        total_alumni = User.objects.filter(role='ALUMNI').count()
+        active_companies = Company.objects.filter(active_hiring=True).count()
+        
+        now = timezone.now()
+        drives_this_month = Company.objects.filter(
+            recruitment_drive_date__year=now.year,
+            recruitment_drive_date__month=now.month
+        ).count()
+        
+        # Chart Data: Student registrations over last 6 months
+        last_6_months = []
+        chart_labels = []
+        chart_data = []
+        
+        for i in range(5, -1, -1):
+            month_date = now - timezone.timedelta(days=i*30)
+            month_name = calendar.month_name[month_date.month][:3]
+            count = User.objects.filter(
+                role='STUDENT',
+                date_joined__year=month_date.year,
+                date_joined__month=month_date.month
+            ).count()
+            chart_labels.append(month_name)
+            chart_data.append(count)
+
+        context = {
+            'total_students': total_students,
+            'total_alumni': total_alumni,
+            'active_companies': active_companies,
+            'drives_this_month': drives_this_month,
+            'chart_labels': chart_labels,
+            'chart_data': chart_data,
+        }
+        return render(request, 'accounts/admin_dashboard.html', context)
     elif user.role == 'ALUMNI':
         from feedback.models import InterviewFeedback
         feedbacks = InterviewFeedback.objects.filter(alumni=user).order_by('-created_at')
+        shared_companies = feedbacks.values_list('company__name', flat=True).distinct()
         context = {
             'feedbacks_count': feedbacks.count(),
             'latest_feedbacks': feedbacks[:5],
+            'shared_companies': shared_companies,
         }
         return render(request, 'accounts/alumni_dashboard.html', context)
     else:
@@ -75,6 +118,36 @@ def dashboard_view(request):
             'latest_attempts': latest_attempts,
         }
         return render(request, 'accounts/student_dashboard.html', context)
+
+@login_required
+def user_list_view(request):
+    if request.user.role != 'ADMIN':
+        messages.error(request, "Access denied.")
+        return redirect('dashboard')
+    
+    users = User.objects.exclude(id=request.user.id).order_by('-date_joined')
+    query = request.GET.get('q')
+    if query:
+        users = users.filter(username__icontains=query) | users.filter(email__icontains=query)
+        
+    return render(request, 'accounts/user_list.html', {'users': users})
+
+@login_required
+def toggle_user_status_view(request, user_id):
+    if request.user.role != 'ADMIN':
+        messages.error(request, "Access denied.")
+        return redirect('dashboard')
+    
+    user_to_toggle = get_object_or_404(User, id=user_id)
+    if user_to_toggle.is_superuser:
+        messages.error(request, "Cannot modify superuser status.")
+    else:
+        user_to_toggle.is_active = not user_to_toggle.is_active
+        user_to_toggle.save()
+        status = "activated" if user_to_toggle.is_active else "blocked"
+        messages.success(request, f"User {user_to_toggle.username} has been {status}.")
+    
+    return redirect('user_list')
 
 def logout_view(request):
     logout(request)

@@ -21,10 +21,12 @@ class InterviewListView(LoginRequiredMixin, ListView):
         else:
             return MockInterview.objects.filter(student=user).order_by('-scheduled_at')
 
+from .forms import MockInterviewForm
+
 class ScheduleInterviewView(LoginRequiredMixin, CreateView):
     model = MockInterview
+    form_class = MockInterviewForm
     template_name = 'mock_interviews/schedule_interview.html'
-    fields = ['student', 'interviewer', 'company', 'topic', 'scheduled_at', 'duration_minutes', 'meeting_link']
     success_url = reverse_lazy('interview_list')
 
     def form_valid(self, form):

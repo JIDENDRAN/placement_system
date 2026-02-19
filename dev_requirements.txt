@@ -3,7 +3,6 @@ Django==4.2.9
 django-environ==0.11.2
 
 # Database
-psycopg2-binary==2.9.9
 dj-database-url==2.1.0
 # For MongoDB support (optional):
 # djongo==1.3.6
@@ -36,7 +35,6 @@ pytz==2023.3
 
 # Deployment
 whitenoise==6.6.0
-gunicorn==21.2.0
 
 # AWS Deployment
 boto3==1.34.14
@@ -44,7 +42,6 @@ django-storages==1.14.2
 
 # Environment
 python-decouple==3.8
-python-dotenv==1.2.1
 
 # Development
 django-debug-toolbar==4.2.0

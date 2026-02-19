@@ -1,16 +1,8 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-
-{% block title %}Manage Company - PlacementHub{% endblock %}
-
-{% block content %}
-<div class="row justify-content-center">
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block title %}Manage Company - PlacementHub{% endblock %} {% block content %} <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card p-4">
             <h3 class="fw-bold mb-4">{% if object %}Edit{% else %}Add{% endif %} Company</h3>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="row">
+            <form method="post" enctype="multipart/form-data"> {% csrf_token %} <div class="row">
                     <div class="col-md-6">{{ form.name|as_crispy_field }}</div>
                     <div class="col-md-6">{{ form.industry|as_crispy_field }}</div>
                 </div>
@@ -37,5 +29,4 @@
             </form>
         </div>
     </div>
-</div>
-{% endblock %}
+</div> {% endblock %}

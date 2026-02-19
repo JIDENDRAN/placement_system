@@ -45,6 +45,22 @@ class MockInterview(models.Model):
     def __str__(self):
         return f"Mock Interview: {self.student.username} - {self.topic}"
 
+    @property
+    def student_name(self):
+        name = self.student.get_full_name()
+        return name if name else self.student.username
+
+    @property
+    def interviewer_name(self):
+        if not self.interviewer:
+            return "Not Assigned"
+        name = self.interviewer.get_full_name()
+        return name if name else self.interviewer.username
+
+    @property
+    def formatted_date(self):
+        return self.scheduled_at.strftime("%b %d, %Y %H:%M")
+
 class MockInterviewFeedback(models.Model):
     interview = models.OneToOneField(MockInterview, on_delete=models.CASCADE, related_name='feedback')
     technical_score = models.IntegerField(default=0, help_text="Scale 1-10")

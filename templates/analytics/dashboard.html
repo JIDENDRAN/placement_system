@@ -1,9 +1,4 @@
-{% extends 'base.html' %}
-
-{% block title %}Analytics - PlacementHub{% endblock %}
-
-{% block content %}
-<div class="row mb-5 align-items-center">
+{% extends 'base.html' %} {% block title %}Analytics - PlacementHub{% endblock %} {% block content %} <div class="row mb-5 align-items-center">
     <div class="col-md-6">
         <h2 class="fw-bold">Performance Analytics</h2>
         <p class="text-secondary">Visualize your progress and download your reports.</p>
@@ -61,9 +56,7 @@
                             <th>Percentage</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for attempt in attempts %}
-                        <tr>
+                    <tbody> {% for attempt in attempts %} <tr>
                             <td>{{ attempt.test.title }}</td>
                             <td>{{ attempt.completed_at|date:"d M Y" }}</td>
                             <td>{{ attempt.score }} / {{ attempt.total_marks }}</td>
@@ -73,18 +66,12 @@
                                         style="width: {% widthratio attempt.score attempt.total_marks 100 %}%"></div>
                                 </div>
                             </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+                        </tr> {% endfor %} </tbody>
                 </table>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
+</div> {% endblock %} {% block extra_js %} <script>
     const ctx = document.getElementById('performanceChart').getContext('2d');
     new Chart(ctx, {
         type: 'bar',
@@ -104,5 +91,4 @@
         }
     }
     });
-</script>
-{% endblock %}
+</script> {% endblock %}

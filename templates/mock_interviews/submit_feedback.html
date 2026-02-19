@@ -1,8 +1,4 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-
-{% block content %}
-<div class="container mt-5">
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block content %} <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card border-0 shadow-lg">
@@ -12,10 +8,7 @@
                     </p>
                 </div>
                 <div class="card-body p-4">
-                    <form method="post">
-                        {% csrf_token %}
-
-                        <div class="row mb-4">
+                    <form method="post"> {% csrf_token %} <div class="row mb-4">
                             <div class="col-md-3 mb-3">
                                 <label class="form-label fw-bold small text-uppercase">Technical</label>
                                 <input type="number" name="technical_score" class="form-control" min="1" max="10"
@@ -73,5 +66,4 @@
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</div> {% endblock %}

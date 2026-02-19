@@ -5,4 +5,5 @@ urlpatterns = [
     path('', views.FeedbackListView.as_view(), name='feedback_list'),
     path('<int:pk>/', views.FeedbackDetailView.as_view(), name='feedback_detail'),
     path('add/', views.FeedbackCreateView.as_view(), name='feedback_create'),
+    path('export-pdf/', views.export_feedback_pdf, name='export_feedback_pdf'),
 ]

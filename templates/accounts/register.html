@@ -1,16 +1,8 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-
-{% block title %}Register - PlacementHub{% endblock %}
-
-{% block content %}
-<div class="row justify-content-center">
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block title %}Register - PlacementHub{% endblock %} {% block content %} <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card p-4">
             <h3 class="text-center fw-bold mb-4">Create Your Account</h3>
-            <form method="post">
-                {% csrf_token %}
-                {{ form|crispy }}
+            <form method="post"> {% csrf_token %} {{ form|crispy }}
                 <div class="d-grid mt-4">
                     <button type="submit" class="btn btn-primary btn-lg">Register</button>
                 </div>
@@ -18,5 +10,4 @@
             <!-- Login link removed as per requirement -->
         </div>
     </div>
-</div>
-{% endblock %}
+</div> {% endblock %}
