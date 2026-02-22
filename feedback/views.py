@@ -57,7 +57,7 @@ class FeedbackCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     success_url = reverse_lazy('feedback_list')
 
     def test_func(self):
-        return self.request.user.role in ['ALUMNI', 'ADMIN', 'STUDENT']
+        return self.request.user.role == 'ALUMNI'
 
     def form_valid(self, form):
         form.instance.alumni = self.request.user

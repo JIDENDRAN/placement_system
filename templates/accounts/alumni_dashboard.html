@@ -1,80 +1,237 @@
-{% extends 'base.html' %} {% block title %}Alumni Dashboard - PlacementHub{% endblock %} {% block content %} <div class="row">
+{% extends 'base.html' %}
+{% block title %}Alumni Dashboard - PlacementHub{% endblock %}
+{% block content %}
+<div class="row">
     <div class="col-md-3">
-        <div class="card p-4 text-center mb-4 border-0 shadow-sm" style="border-radius: 20px;">
+        <div class="card p-4 text-center mb-4 border-0 shadow-sm" style="border-radius: 20px; background: white;">
             <div class="mb-3">
                 <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center"
                     style="width: 80px; height: 80px;">
                     <i class="bi bi-person-workspace fs-1"></i>
                 </div>
             </div>
-            <h5 class="fw-bold">{{ user.get_full_name|default:user.username }}</h5>
-            <p class="text-secondary mb-1">Passout Year: {{ user.alumni_profile.passout_year|default:"N/A" }}</p>
-            <p class="small text-muted mb-0">Member since {{ user.date_joined|date:"Y" }}</p>
+            <h5 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h5>
+            <p class="text-secondary small mb-1">Passout: {{ user.alumni_profile.passout_year|default:"N/A" }}</p>
+            <p class="text-muted small mb-3">Member since {{ user.date_joined|date:"Y" }}</p>
             <hr>
             <div class="d-grid gap-2">
-                <a href="{% url 'feedback_create' %}" class="btn btn-primary btn-sm rounded-pill fw-bold">Submit New
+                <a href="{% url 'feedback_create' %}" class="btn btn-primary btn-sm rounded-pill fw-bold py-2">Submit
                     Feedback</a>
             </div>
         </div>
     </div>
 
     <div class="col-md-9">
-        <h2 class="fw-bold mb-4">Alumni Dashboard</h2>
+        <h2 class="fw-bold mb-4">Alumni <span class="text-primary">Dashboard</span></h2>
 
-        <div class="row mb-4">
+        <div id="alumni-data" data-feedbacks="{{ feedbacks_count|default:0 }}" style="display:none;"></div>
+
+        <div class="row mb-4 g-3">
             <div class="col-md-6">
                 <div class="card p-4 h-100 border-0 shadow-sm" style="border-radius: 20px;">
-                    <h5 class="fw-bold mb-3">Your Contributions</h5>
+                    <h6 class="text-uppercase small fw-bold text-secondary mb-3">Your Contributions</h6>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-secondary">Interview Feedbacks Shared</span>
-                        <span class="badge bg-primary rounded-pill px-3">{{ feedbacks_count }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-secondary">Impact on Students</span>
-                        <span class="badge bg-success rounded-pill px-3">High</span>
+                        <span class="text-dark fw-bold">Feedbacks Shared</span>
+                        <span class="badge bg-primary rounded-pill px-3 py-2 fs-6">{{ feedbacks_count }}</span>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card p-4 h-100 border-0 shadow-sm bg-primary text-white"
+                <div class="card p-4 h-100 border-0 shadow-sm text-white"
                     style="border-radius: 20px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
-                    <h5 class="fw-bold mb-2">Network Impact</h5>
-                    <h1 class="display-4 fw-bold mb-0">Top 5%</h1>
-                    <p class="small opacity-75">Your feedbacks are helping students prepare better for {% if shared_companies %} {% for company in shared_companies %} {{ company }}{% if not forloop.last %}, {% endif %} {% endfor %} {% elif user.alumni_profile.placed_company %} {{ user.alumni_profile.placed_company }} {% else %} top companies {% endif %}!
-                    </p>
+                    <h6 class="text-uppercase small fw-bold opacity-75 mb-3">Network Impact</h6>
+                    <p class="small mb-0">Help students prepare for:</p>
+                    <h5 class="fw-bold mt-1">
+                        {% if shared_companies %}
+                        {% for company in shared_companies %}
+                        {{ company }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                        {% elif user.alumni_profile.placed_company %}
+                        {{ user.alumni_profile.placed_company }}
+                        {% else %}
+                        Global Partners
+                        {% endif %}
+                    </h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-0 border-0 shadow-sm mb-4"
+            style="border-radius: 20px; overflow: hidden; background: #0f172a;">
+            <div class="p-4 d-flex justify-content-between align-items-center position-absolute w-100"
+                style="z-index: 10; pointer-events: none;">
+                <h5 class="fw-bold text-white mb-0">Performance Analytics</h5>
+                <span class="badge bg-primary rounded-pill px-3 py-2" style="pointer-events: auto;">3D Activity
+                    Model</span>
+            </div>
+            <div id="alumni-stats-3d-wrapper"
+                style="width: 100%; height: 400px; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); position: relative;">
+                <div id="alumni-tooltip-3d"
+                    style="position: absolute; display: none; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); color: white; padding: 10px; border-radius: 10px; border: 1px solid rgba(46, 204, 113, 0.5); pointer-events: none; z-index: 100; font-family: 'Inter', sans-serif;">
                 </div>
             </div>
         </div>
 
         <div class="card p-4 border-0 shadow-sm" style="border-radius: 20px;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">Recent Feedback Submissions</h5>
-                <a href="{% url 'feedback_list' %}" class="small text-primary text-decoration-none fw-bold">View All</a>
-            </div>
+            <h5 class="fw-bold mb-3">Recent Submissions</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
                             <th>Company</th>
-                            <th>Role</th>
-                            <th>Date</th>
+                            <th>Job Role</th>
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody> {% for feedback in latest_feedbacks %} <tr>
+                    <tbody>
+                        {% for feedback in latest_feedbacks %}
+                        <tr>
                             <td class="fw-bold text-dark">{{ feedback.company.name }}</td>
-                            <td class="text-secondary">{{ feedback.job_role }}</td>
-                            <td class="text-muted small">{{ feedback.created_at|date:"M d, Y" }}</td>
-                            <td> {% if feedback.status == 'SELECTED' %} <span
-                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 border-0">Selected</span> {% elif feedback.status == 'REJECTED' %} <span
-                                    class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 border-0">Rejected</span> {% else %} <span
-                                    class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 border-0">Pending</span> {% endif %} </td>
-                        </tr> {% empty %} <tr>
-                            <td colspan="4" class="text-center py-4 text-muted">You haven't shared any feedback yet.
+                            <td>{{ feedback.job_role }}</td>
+                            <td><span
+                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Published</span>
                             </td>
-                        </tr> {% endfor %} </tbody>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">No feedback shared yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
-</div> {% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    (function () {
+        const wrapper = document.getElementById('alumni-stats-3d-wrapper');
+        const tooltip = document.getElementById('alumni-tooltip-3d');
+        const dataNode = document.getElementById('alumni-data');
+        if (!wrapper || !dataNode) return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, wrapper.clientWidth / wrapper.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        wrapper.appendChild(renderer.domElement);
+
+        const group = new THREE.Group();
+        scene.add(group);
+
+        const fCount = parseInt(dataNode.dataset.feedbacks) || 0;
+        const data = [
+            { label: 'Contributions', value: fCount, color: 0x4f46e5 },
+            { label: 'Impact', value: 85, color: 0x10b981 },
+            { label: 'Mentorship', value: 45, color: 0xf59e0b }
+        ];
+
+        const maxVal = Math.max(...data.map(d => d.value), 10);
+        const scale = 6 / maxVal;
+
+        // Base Platform
+        const platform = new THREE.Mesh(
+            new THREE.CylinderGeometry(5.5, 6, 0.4, 32),
+            new THREE.MeshPhongMaterial({ color: 0x1e293b, transparent: true, opacity: 0.8 })
+        );
+        platform.position.y = -0.2;
+        group.add(platform);
+
+        const bars = [];
+        data.forEach((item, i) => {
+            const h = Math.max(item.value * scale, 1.2);
+            const geometry = new THREE.BoxGeometry(1.5, h, 1.5);
+            const material = new THREE.MeshPhongMaterial({
+                color: item.color,
+                emissive: item.color,
+                emissiveIntensity: 0.2,
+                transparent: true,
+                opacity: 0.85
+            });
+            const bar = new THREE.Mesh(geometry, material);
+
+            const angle = (i / data.length) * Math.PI * 2;
+            const radius = 3.2;
+            bar.position.set(Math.cos(angle) * radius, h / 2, Math.sin(angle) * radius);
+            bar.lookAt(0, h / 2, 0);
+            bar.userData = { label: item.label, value: item.value };
+
+            // Glowing Edges
+            const edges = new THREE.EdgesGeometry(geometry);
+            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 }));
+            bar.add(line);
+
+            bars.push(bar);
+            group.add(bar);
+
+            // Animation
+            bar.scale.y = 0.01;
+            bar.position.y = 0;
+            const grow = () => {
+                if (bar.scale.y < 1) {
+                    bar.scale.y += 0.05;
+                    bar.position.y = (h * bar.scale.y) / 2;
+                    requestAnimationFrame(grow);
+                }
+            };
+            setTimeout(grow, i * 150);
+        });
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const light = new THREE.PointLight(0x2ecc71, 1.2, 20);
+        light.position.set(5, 8, 5);
+        scene.add(light);
+
+        camera.position.set(9, 9, 9);
+        camera.lookAt(0, 1, 0);
+
+        const rc = new THREE.Raycaster();
+        const m = new THREE.Vector2();
+
+        wrapper.addEventListener('mousemove', (e) => {
+            const rect = wrapper.getBoundingClientRect();
+            m.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            m.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            rc.setFromCamera(m, camera);
+
+            const intersects = rc.intersectObjects(bars);
+            bars.forEach(b => {
+                b.material.emissiveIntensity = 0.2;
+                b.scale.set(1, 1, 1);
+            });
+
+            if (intersects.length > 0) {
+                const b = intersects[0].object;
+                b.material.emissiveIntensity = 0.8;
+                b.scale.set(1.1, 1.1, 1.1);
+                wrapper.style.cursor = 'pointer';
+                tooltip.style.display = 'block';
+                tooltip.innerHTML = `<strong>${b.userData.label}</strong><br>Value: ${b.userData.value}`;
+                tooltip.style.left = (e.clientX - rect.left + 15) + 'px';
+                tooltip.style.top = (e.clientY - rect.top - 15) + 'px';
+            } else {
+                wrapper.style.cursor = 'default';
+                tooltip.style.display = 'none';
+            }
+        });
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+            group.rotation.y += 0.003;
+            renderer.render(scene, camera);
+        };
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = wrapper.clientWidth / wrapper.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+        });
+    })();
+</script>
+{% endblock %}

@@ -14,7 +14,7 @@ class CustomLoginView(LoginView):
         user = form.get_user()
         selected_role = form.cleaned_data.get('role')
         if user.role != selected_role:
-            messages.error(self.request, f"Access denied. You are registered as {user.role}, not {selected_role}.")
+            form.add_error(None, f"Access denied. You are registered as {user.role}, not {selected_role}.")
             return self.form_invalid(form)
         return super().form_valid(form)
 
@@ -73,6 +73,8 @@ def dashboard_view(request):
             'drives_this_month': drives_this_month,
             'chart_labels': chart_labels,
             'chart_data': chart_data,
+            'alumni_list': User.objects.filter(role='ALUMNI'),
+            'company_list': Company.objects.all(),
         }
         return render(request, 'accounts/admin_dashboard.html', context)
     elif user.role == 'ALUMNI':

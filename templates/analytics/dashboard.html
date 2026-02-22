@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% block title %}Analytics - PlacementHub{% endblock %} {% block content %} <div class="row mb-5 align-items-center">
+{% extends 'base.html' %} {% block title %}Analytics - PlacementHub{% endblock %} {% block content %} <div
+    class="row mb-5 align-items-center">
     <div class="col-md-6">
         <h2 class="fw-bold">Performance Analytics</h2>
         <p class="text-secondary">Visualize your progress and download your reports.</p>
@@ -15,12 +16,18 @@
         </div>
     </div>
 </div>
-
+<div id="analytics-data" data-labels="{{ labels|safe }}" data-scores="{{ scores|safe }}" style="display:none;"></div>
 <div class="row mb-5">
     <div class="col-md-8">
         <div class="card p-4">
             <h5 class="fw-bold mb-4">Score Trends</h5>
             <canvas id="performanceChart"></canvas>
+            <div id="three-canvas-container"
+                style="width: 100%; height: 400px; margin-top: 20px; background: #0f172a; border-radius: 15px; position: relative; overflow: hidden;">
+                <div id="analytics-tooltip"
+                    style="position: absolute; display: none; background: rgba(0,0,0,0.8); color: white; padding: 8px; border-radius: 4px; pointer-events: none; z-index: 10;">
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-md-4">
@@ -41,7 +48,6 @@
         </div>
     </div>
 </div>
-
 <div class="row">
     <div class="col-12">
         <div class="card p-4">
@@ -62,8 +68,8 @@
                             <td>{{ attempt.score }} / {{ attempt.total_marks }}</td>
                             <td>
                                 <div class="progress" style="height: 5px; width: 100px;">
-                                    <div class="progress-bar bg-primary"
-                                        style="width: {% widthratio attempt.score attempt.total_marks 100 %}%"></div>
+                                    {% widthratio attempt.score attempt.total_marks 100 as percentage %}
+                                    <div class="progress-bar bg-primary" style="width: {{ percentage }}%"></div>
                                 </div>
                             </td>
                         </tr> {% endfor %} </tbody>
@@ -71,24 +77,59 @@
             </div>
         </div>
     </div>
-</div> {% endblock %} {% block extra_js %} <script>
-    const ctx = document.getElementById('performanceChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {{ labels| safe }},
-        datasets: [{
-            label: 'Score',
-            data: {{ scores| safe }},
-        backgroundColor: '#2a5298',
-        borderRadius: 5
-            }]
-        },
-        options: {
-        responsive: true,
-        scales: {
-            y: { beginAtZero: true }
-        }
+</div> {% endblock %} {% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    const dataNode = document.getElementById('analytics-data');
+    if (dataNode) {
+        let labels = []; let scores = [];
+        try {
+            labels = JSON.parse(dataNode.dataset.labels.replace(/'/g, '"'));
+            scores = JSON.parse(dataNode.dataset.scores);
+        } catch (e) { console.error(e); }
+
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar', data: { labels: labels, datasets: [{ label: 'Score', data: scores, backgroundColor: '#2a5298', borderRadius: 5 }] },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        const threeDiv = document.getElementById('three-canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, threeDiv.clientWidth / 400, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(threeDiv.clientWidth, 400); threeDiv.appendChild(renderer.domElement);
+        const group = new THREE.Group(); scene.add(group);
+        const maxScore = Math.max(...scores, 100); const scale = 5 / maxScore;
+        const bars = [];
+        labels.forEach((l, i) => {
+            const h = scores[i] * scale;
+            const bar = new THREE.Mesh(new THREE.BoxGeometry(0.8, h, 0.8), new THREE.MeshPhongMaterial({ color: 0x4f46e5, transparent: true, opacity: 0.8, emissive: 0x4f46e5, emissiveIntensity: 0.2 }));
+            bar.position.set((i - (labels.length - 1) / 2) * 1.5, h / 2, 0);
+            bar.userData = { label: l, score: scores[i] };
+            bar.add(new THREE.LineSegments(new THREE.EdgesGeometry(bar.geometry), new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.3, transparent: true })));
+            bars.push(bar); group.add(bar);
+        });
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const light = new THREE.PointLight(0xffffff, 1, 100); light.position.set(10, 10, 10); scene.add(light);
+        camera.position.set(0, 5, 8); camera.lookAt(0, 2, 0);
+        const rc = new THREE.Raycaster(); const m = new THREE.Vector2();
+        const tooltip = document.getElementById('analytics-tooltip');
+        threeDiv.addEventListener('mousemove', (e) => {
+            const r = threeDiv.getBoundingClientRect();
+            m.x = ((e.clientX - r.left) / r.width) * 2 - 1; m.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+            rc.setFromCamera(m, camera); const intersects = rc.intersectObjects(bars);
+            bars.forEach(b => b.material.emissiveIntensity = 0.2);
+            if (intersects.length > 0) {
+                const b = intersects[0].object; b.material.emissiveIntensity = 0.8;
+                tooltip.style.display = 'block'; tooltip.innerHTML = `<strong>${b.userData.label}</strong>: ${b.userData.score}%`;
+                const v = b.position.clone().project(camera);
+                tooltip.style.left = (v.x * 0.5 + 0.5) * threeDiv.clientWidth + 'px';
+                tooltip.style.top = (v.y * -0.5 + 0.5) * 400 + 'px';
+            } else tooltip.style.display = 'none';
+        });
+        const anim = () => { requestAnimationFrame(anim); group.rotation.y += 0.005; renderer.render(scene, camera); }; anim();
+        window.addEventListener('resize', () => { camera.aspect = threeDiv.clientWidth / 400; camera.updateProjectionMatrix(); renderer.setSize(threeDiv.clientWidth, 400); });
     }
-    });
-</script> {% endblock %}
+</script>
+{% endblock %}
