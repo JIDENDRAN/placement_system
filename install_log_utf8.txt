@@ -1,9 +1,0 @@
-﻿Requirement already satisfied: Django==4.2.9 in e:\codethrive\codethrive projects\placement_system\venv\lib\site-packages (from -r requirements.txt (line 2)) (4.2.9)
-Collecting django-environ==0.11.2 (from -r requirements.txt (line 3))
-  Using cached django_environ-0.11.2-py2.py3-none-any.whl.metadata (11 kB)
-Collecting psycopg2-binary==2.9.9 (from -r requirements.txt (line 6))
-  Using cached psycopg2-binary-2.9.9.tar.gz (384 kB)
-  Installing build dependencies: started
-  Installing build dependencies: finished with status 'done'
-  Getting requirements to build wheel: started
-  Getting requirements to build wheel: finished with status 'error'
