@@ -95,20 +95,36 @@ TEMPLATES = [
 WSGI_APPLICATION = 'placement_project.wsgi.application'
 
 
-# Database
+# Database Configuration
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-# 
-# To use AWS RDS PostgreSQL, set DATABASE_URL in your .env file:
-# DATABASE_URL=postgres://user:password@your-rds-endpoint.amazonaws.com:5432/placement_db
-#
-# If DATABASE_URL is not set, it falls back to local SQLite for development.
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3'),
-        conn_max_age=600
-    )
-}
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # If DATABASE_URL is not set, we raise an error in production
+    # but for now, we'll keep a warning/placeholder to guide the user
+    # to the .env file.
+    import sys
+    if 'test' not in sys.argv:
+        print("WARNING: DATABASE_URL not found in environment. Please configure AWS RDS in your .env file.")
+    
+    # Still fall back to a local DB if absolutely necessary for internal scripts,
+    # but we'll use a postgres-style URL format in the .env as the primary method.
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
 
 
 

@@ -156,7 +156,7 @@ placement_system/
 
 - **Backend**: Django 4.2+
 - **Frontend**: HTML5, CSS3, Bootstrap 5, JavaScript
-- **Database**: PostgreSQL (recommended) or MongoDB with djongo
+- **Database**: PostgreSQL (AWS RDS - Primary Database)
 - **Charts**: Chart.js
 - **PDF Generation**: ReportLab / WeasyPrint
 - **Authentication**: Django built-in auth with custom user model
